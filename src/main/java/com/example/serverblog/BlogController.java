@@ -1,5 +1,7 @@
 package com.example.serverblog;
 
+//ResponseEntity
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ public class BlogController {
         return getBlogPostByID(id);
     }
 
-    @RequestMapping(value = "update/{id}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "update/{id}", method = RequestMethod.PUT)
     public BlogPost updateBlogPost(@PathVariable("id") int id, @RequestBody BlogPost blogPostChanges){
         System.out.println("Getting blog post with id " + id);
         BlogPost blogPostToUpdate = getBlogPostByID(id);
@@ -75,7 +77,7 @@ public class BlogController {
                 return allBlogPosts.get(i);
             }
         }
-        return new BlogPost();
+        return null;
     }
     private BlogPost updateBlogPostByID(int id, BlogPost updatedBlogPost){
         for(int i = 0; i < allBlogPosts.size(); i++){
@@ -85,6 +87,6 @@ public class BlogController {
                 return allBlogPosts.get(i);
             }
         }
-        return new BlogPost();
+        return null;
     }
 }

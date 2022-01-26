@@ -25,9 +25,9 @@ Skapa en klass som mall för blog-inlägg(Objekt)
 - Then: Ska klienten visa det efterfrågade blog inlägget
 
 #### /api/v1/blog/update/<id>
-- Given: Att har valt att uppdatera ett inlägg
+- Given: Att användaren har valt att uppdatera ett inlägg
 - When: Användaren angett de nya uppgifterna
-- Then: Ska klienten visa ge ett meddelande att uppdateringen gick bra
+- Then: Ska klienten visa ett meddelande att uppdateringen gick bra
 
 #### /api/v1/blog/create
 - Given: Att användaren har användaren meny framför sig
@@ -45,3 +45,7 @@ Skapa en klass som mall för blog-inlägg(Objekt)
 - Then: Ska servern svara med att blogginlägget inte finns, och klienten sedan visar detta svar.
 
 
+## Klient
+- Given: Att användaren har applikationen på sin klient
+- When: Användaren startar applikationen
+- Then: Ska användaren presenteras med en huvudmeny
