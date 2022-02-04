@@ -44,8 +44,22 @@ Skapa en klass som mall för blog-inlägg(Objekt)
 - When: Klienten försöker skicka en förfrågan till servern om ovanstående information
 - Then: Ska servern svara med att blogginlägget inte finns, och klienten sedan visar detta svar.
 
+### ResponseEntity
+- Lägga till så man får mer specifika respons-koder
+
+### Dependency Injection
+- Dela upp BlogController i en controller och en service.
+
+### Loggning
+- Lägga till ramverk för loggning och skriva till några metoder
 
 ## Klient
+
+### Användar menu
 - Given: Att användaren har applikationen på sin klient
 - When: Användaren startar applikationen
 - Then: Ska användaren presenteras med en huvudmeny
+
+### ResponseEntity
+- Lägga in så att respons-koden visas när något har gått fel i klienten
+

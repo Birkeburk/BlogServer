@@ -1,92 +1,94 @@
 package com.example.serverblog;
 
-//ResponseEntity
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
 @RestController
 @RequestMapping(value = "api/v1/blog")
 public class BlogController {
+    private BlogService blogService;
 
-    ArrayList<BlogPost> allBlogPosts;
-    int latestBlogPostID;
+    private Logger logger;
 
-    public BlogController(){
-
-        allBlogPosts = new ArrayList<>();
-        latestBlogPostID = 0;
+    @Autowired
+    public BlogController(BlogService blogService) {
+        this.blogService = blogService;
+        logger = LoggerFactory.getLogger(BlogController.class);
     }
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
-    public BlogPost addBlogPost(@RequestBody BlogPost blogPost){
-        latestBlogPostID++;
-        blogPost.setId(latestBlogPostID);
-        allBlogPosts.add(blogPost);
-        System.out.println("BlogPost has successfully been created");
-        return blogPost;
+    public ResponseEntity<BlogPost> addBlogPost(@RequestBody BlogPost blogPost) {
+        if (blogPost.getTitle().equals("") || blogPost.getBody().equals("")) {
+            logger.warn("Couldn't create blog post.");
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+
+        } else {
+            BlogPost newBlogPost = blogService.createBlogPost(blogPost);
+            logger.info("Blog post with ID: [" + blogPost.getId() + "] has successfully been created.");
+            return new ResponseEntity<>(newBlogPost, HttpStatus.CREATED);
+        }
     }
 
     @RequestMapping(value = "list", method = RequestMethod.GET)
-    public ArrayList<BlogPost> listBlogPosts(){
-        System.out.println("BlogPosts are being loaded");
-        return allBlogPosts;
+    public ResponseEntity<ArrayList<BlogPost>> listBlogPosts() {
+            logger.info("Blog posts are being loaded.");
+            return new ResponseEntity<>(blogService.getBlogPosts(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "view/{id}", method = RequestMethod.GET)
-    public BlogPost listBlogPost(@PathVariable("id") int id){
+    public ResponseEntity<BlogPost> listBlogPost(@PathVariable("id") int id) {
         System.out.println("BlogPost is being loading");
-        return getBlogPostByID(id);
+
+        BlogPost fetchedPost = blogService.getBlogPost(id);
+
+        if (fetchedPost == null) {
+            logger.warn("Couldn't find blog post with ID: [" + id + "].");
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } else {
+            logger.info("Loading blog post with ID: [" + id + "].");
+            return new ResponseEntity<>(fetchedPost, HttpStatus.OK);
+        }
     }
 
-    @RequestMapping(value = "update/{id}", method = RequestMethod.PUT)
-    public BlogPost updateBlogPost(@PathVariable("id") int id, @RequestBody BlogPost blogPostChanges){
-        System.out.println("Getting blog post with id " + id);
-        BlogPost blogPostToUpdate = getBlogPostByID(id);
+    @RequestMapping(value = "update/{id}", method = RequestMethod.POST)
+    public ResponseEntity<BlogPost> updateBlogPost(@PathVariable("id") int id, @RequestBody BlogPost blogPostChanges) {
 
-        if(blogPostChanges.getTitle() != null){
-            blogPostToUpdate.setTitle(blogPostChanges.getTitle());
+        String title = blogPostChanges.getTitle();
+        String body = blogPostChanges.getBody();
+
+        if(title.equals("") || body.equals("")){
+            logger.warn("Missing body or title updating post with ID: [" + id + "];" + blogPostChanges);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(blogPostChanges.getBody() != null){
-            blogPostToUpdate.setBody(blogPostChanges.getBody());
+
+        BlogPost updatedBlogPost = blogService.updateBlogPost(id, title, body);
+
+        if (updatedBlogPost != null) {
+                logger.info("Blog post with ID: [" + id + "] has been updated.");
+                return new ResponseEntity<>(updatedBlogPost, HttpStatus.OK);
+        } else {
+            logger.warn("Blog post with ID: [" + id + "] doesn't exist.");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        updateBlogPostByID(id, blogPostToUpdate);
-
-        System.out.println("Blog post with id " + id + " has successfully been updated");
-
-        return blogPostToUpdate;
     }
 
     @RequestMapping(value = "delete/{id}", method = RequestMethod.DELETE)
-    public void deleteBlogPost(@PathVariable("id") int id){
-        System.out.println("Getting blog post with id " + id);
-        for(int i = 0; i < allBlogPosts.size(); i++){
-            if(getBlogPostByID(id) == allBlogPosts.get(i)){
-                allBlogPosts.remove(i);
-                System.out.println("Blog post with id " + id + " has successfully been deleted");
-            }
+    public ResponseEntity<Void> deleteBlogPost(@PathVariable("id") int id) {
+        boolean success = blogService.deleteBlogPost(id);
+
+        if (success) {
+            logger.info("Blog post with ID: [" + id + "] has been deleted.");
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            logger.warn("Blog post with ID: [" + id + "] was not found.");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    private BlogPost getBlogPostByID(int id){
-        for(int i = 0; i < allBlogPosts.size(); i++){
-            BlogPost currentBlogPost = allBlogPosts.get(i);
-            if(currentBlogPost.getId() == id){
-                return allBlogPosts.get(i);
-            }
-        }
-        return null;
-    }
-    private BlogPost updateBlogPostByID(int id, BlogPost updatedBlogPost){
-        for(int i = 0; i < allBlogPosts.size(); i++){
-            BlogPost currentBlogPost = allBlogPosts.get(i);
-            if(currentBlogPost.getId() == id){
-                allBlogPosts.set(i, updatedBlogPost);
-                return allBlogPosts.get(i);
-            }
-        }
-        return null;
-    }
 }
