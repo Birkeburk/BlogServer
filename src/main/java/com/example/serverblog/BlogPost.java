@@ -5,7 +5,6 @@ public class BlogPost {
     private String body;
     private int id;
 
-
     public String getTitle() {
         return title;
     }
