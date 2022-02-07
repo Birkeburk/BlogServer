@@ -1,11 +1,15 @@
 package com.example.serverblog;
 
+//Paket som används av spring ramverket
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+//Används för att logga händelser och information
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 
 @RestController
@@ -21,19 +25,21 @@ public class BlogController {
         logger = LoggerFactory.getLogger(BlogController.class);
     }
 
+    //Metod för att returnera en responsecode för att berätta om det gick bra eller dåligt att skapa ett inlägg
     @RequestMapping(value = "create", method = RequestMethod.POST)
-    public ResponseEntity<BlogPost> addBlogPost(@RequestBody BlogPost blogPost) {
+    public ResponseEntity<Void> addBlogPost(@RequestBody BlogPost blogPost) {
 
         if (blogPost.getTitle().equals("") || blogPost.getBody().equals("")) {
             logger.warn("Couldn't create blog post.");
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            BlogPost newBlogPost = blogService.createBlogPost(blogPost);
+            blogService.createBlogPost(blogPost);
             logger.info("Blog post with ID: [" + blogPost.getId() + "] has successfully been created.");
-            return new ResponseEntity<>(newBlogPost, HttpStatus.CREATED);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
     }
 
+    //Metod för att returnera en arraylist av Blog inlägg
     @RequestMapping(value = "list", method = RequestMethod.GET)
     public ResponseEntity<ArrayList<BlogPost>> listBlogPosts() {
 
@@ -41,6 +47,7 @@ public class BlogController {
         return new ResponseEntity<>(blogService.getBlogPosts(), HttpStatus.OK);
     }
 
+    //Metod för att returnera ett specifikt Blog inlägg om det finns
     @RequestMapping(value = "view/{id}", method = RequestMethod.GET)
     public ResponseEntity<BlogPost> listBlogPost(@PathVariable("id") int id) {
 
@@ -55,6 +62,7 @@ public class BlogController {
         }
     }
 
+    //Metod för att returnera en responsecode för att berätta för klienten om det gick bra eller dåligt att updater inlägg
     @RequestMapping(value = "update/{id}", method = RequestMethod.POST)
     public ResponseEntity<BlogPost> updateBlogPost(@PathVariable("id") int id, @RequestBody BlogPost blogPostChanges) {
 
@@ -77,6 +85,7 @@ public class BlogController {
         }
     }
 
+    //Metod för att returnera en responsecode för att berätta för klienten om det gick bra eller dåligt att radera inlägg
     @RequestMapping(value = "delete/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteBlogPost(@PathVariable("id") int id) {
         boolean success = blogService.deleteBlogPost(id);
@@ -89,5 +98,4 @@ public class BlogController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
 }
