@@ -61,6 +61,7 @@ public class BlogService {
     private BlogPost getBlogPostByID(int id) {
         for (int i = 0; i < allBlogPosts.size(); i++) {
             BlogPost currentBlogPost = allBlogPosts.get(i);
+
             if (currentBlogPost.getId() == id) {
                 return allBlogPosts.get(i);
             }
@@ -72,6 +73,7 @@ public class BlogService {
     private BlogPost updateBlogPostByID(int id, BlogPost updatedBlogPost) {
         for (int i = 0; i < allBlogPosts.size(); i++) {
             BlogPost currentBlogPost = allBlogPosts.get(i);
+
             if (currentBlogPost.getId() == id) {
                 allBlogPosts.set(i, updatedBlogPost);
                 return allBlogPosts.get(i);

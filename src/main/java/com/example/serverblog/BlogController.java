@@ -1,6 +1,7 @@
 package com.example.serverblog;
 
 //Paket som används av spring ramverket
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
